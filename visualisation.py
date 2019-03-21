@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 df = pd.read_csv('graph.csv')
+df = df.head(1000)
 node_indices = df['Target']
 
 # Map cubehelix_palette
@@ -50,25 +51,27 @@ for node in G.nodes:
     node_size[node] = 5*v
 # node_size = {k:5*v for k,v in G.degree()}
 # Some Random index
-node_color = {k:v for k,v in enumerate(np.random.uniform(low=0, high=21, size=(G.number_of_nodes(),)).round(1))}
+# node_color = {k:v for k,v in enumerate(np.random.uniform(low=0, high=21, size=(G.number_of_nodes(),)).round(1))}
 
 ### set node attributes
-nx.set_node_attributes(G,node_color, 'node_color')
+# nx.set_node_attributes(G,node_color, 'node_color')
 nx.set_node_attributes(G,node_size,'node_size')
 
-source=ColumnDataSource(pd.DataFrame.from_dict({k:v for k,v in G.nodes(data=True)},orient='index'))
-mapper = LinearColorMapper(palette=pal_hex_lst, low=0, high=21)
+# source=ColumnDataSource(pd.DataFrame.from_dict({k:v for k,v in G.nodes(data=True)},orient='index'))
+# mapper = LinearColorMapper(palette=pal_hex_lst, low=0, high=21)
 
 ### Initiate bokeh plot
 plot = figure(title="Resized Node Demo", x_range=(-1.1,1.1), y_range=(-1.1,1.1),
           tools="", toolbar_location=None)
 
 # Graph renderer using nx
-graph = from_networkx(G, nx.spring_layout, scale=2, center=(0,0))
+graph = from_networkx(G, nx.fruchterman_reingold_layout)
 
 # Style node
-graph.node_renderer.data_source = source
-graph.node_renderer.glyph = Circle(size='node_size', fill_color={'field': 'node_color', 'transform': mapper})
+# graph.node_renderer.data_source = source
+# graph.node_renderer.glyph = Circle(size='node_size', fill_color={'field': 'node_color', 'transform': mapper})
+graph.node_renderer.glyph = Circle(size='node_size')
+graph.edge_renderer.glyph = MultiLine(line_color="#CCCCCC", line_alpha=0.8, line_width=1)
 plot.renderers.append(graph)
 
 show(plot)
